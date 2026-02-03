@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const ProductCard = ({ product }: IProps) => {
-  const { title, description, price, imageURL, category } = product;
+  const { title, description, price, imageURL, category, colors } = product;
   return (
     <div className="max-w-sm md:max-w-lg mx-auto md:mx-0 border rounded-md p-2 flex flex-col">
       <Image
@@ -21,9 +21,14 @@ const ProductCard = ({ product }: IProps) => {
       <p>{textSlicer(description)}</p>
 
       <div className="flex space-x-2 my-4 items-center">
-        <span className="w-5 h-5 bg-indigo-600 rounded-full cursor-pointer"></span>
-        <span className="w-5 h-5 bg-yellow-600 rounded-full cursor-pointer"></span>
-        <span className="w-5 h-5 bg-red-600 rounded-full cursor-pointer"></span>
+        {/* make the colors */}
+        {colors.map((color, index) => (
+          <span
+            key={index}
+            className="w-5 h-5 rounded-full cursor-pointer border"
+            style={{ backgroundColor: color }}
+          />
+        ))}{' '}
       </div>
 
       <div className="flex justify-between items-center">
@@ -36,8 +41,8 @@ const ProductCard = ({ product }: IProps) => {
       </div>
 
       <div className="flex items-center justify-between space-x-2 mt-5">
-        <Button className="bg-indigo-700 ">Edit</Button>
-        <Button className="bg-red-700 ">Destroy</Button>
+        <Button className="bg-indigo-700 hover:bg-indigo-800">Edit</Button>
+        <Button className="bg-red-700 hover:bg-red-800">Destroy</Button>
       </div>
     </div>
   );
