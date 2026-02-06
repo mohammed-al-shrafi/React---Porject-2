@@ -1,4 +1,4 @@
-export interface IProduct  {
+export interface IProduct {
   id?: string | undefined;
   title: string;
   description: string;
@@ -8,4 +8,9 @@ export interface IProduct  {
   category: { name: string; imageURL: string };
 }
 
-export type Product = IProduct;
+export interface IFormInput {
+  id: string;
+  name: string;
+  label: string;
+  type: string;
+}
