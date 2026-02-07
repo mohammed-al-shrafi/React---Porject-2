@@ -21,14 +21,13 @@ const ProductCard = ({ product }: IProps) => {
       <p>{textSlicer(description)}</p>
 
       <div className="flex space-x-2 my-4 items-center">
-        {/* make the colors */}
         {colors.map((color, index) => (
           <span
             key={index}
             className="w-5 h-5 rounded-full cursor-pointer border"
             style={{ backgroundColor: color }}
           />
-        ))}{' '}
+        ))}
       </div>
 
       <div className="flex justify-between items-center">

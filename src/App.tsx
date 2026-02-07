@@ -1,11 +1,13 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import type { IProduct } from './interface';
+import { colors, formInputList, productList } from './data';
+import { productValidation } from './validation';
 import ProductCard from './components/ProductCard';
 import Modal from './components/ui/Modal';
 import Button from './components/ui/Button';
 import Input from './components/ui/Input';
-import { formInputList, productList } from './data';
-import type { IProduct } from './interface';
-import { productValidation } from './validation';
+import CircleColor from './components/CircleColor';
 import ErrorMessage from './components/ErrorMessage';
 
 function App() {
@@ -18,9 +20,11 @@ function App() {
     category: { name: '', imageURL: '' },
   };
 
-  // State
+  // ---------State---------
+  const [products, setProducts] = useState<IProduct[]>(productList);
   const [product, setProduct] = useState<IProduct>(defaultProduct);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [tempColor, setTempColor] = useState<string[]>([]);
   const [errors, setErrors] = useState({
     title: '',
     description: '',
@@ -32,7 +36,7 @@ function App() {
 
   const close = () => setIsOpen(false);
 
-  // Handlers
+  // ---------Handlers---------
   const onCancel = () => {
     setProduct(defaultProduct);
   };
@@ -72,18 +76,22 @@ function App() {
       setErrors(errors);
       return;
     }
-
-    alert('Form submitted successfully!');
+    setProducts((prev) => [
+      { ...product, colors: tempColor, id: uuidv4() },
+      ...prev,
+    ]);
     setProduct(defaultProduct);
+    setTempColor([]);
+    close();
   };
 
-  // Render
-  const renderProductList = productList.map((product) => (
+  // ---------Render---------
+  const renderProductList = products.map((product) => (
     <ProductCard key={product.id} product={product} />
   ));
 
   const renderFromInputList = formInputList.map((input) => {
-    const value: string | number | readonly string[] | undefined =
+    const value: string | readonly string[] | undefined =
       input.name === 'category'
         ? product.category.name
         : input.name === 'price'
@@ -113,6 +121,21 @@ function App() {
     );
   });
 
+  const renderProductColors = colors.map((color, index) => (
+    <CircleColor
+      key={index}
+      color={color}
+      onClick={() => {
+        if (tempColor.includes(color)) {
+          setTempColor((prev) => prev.filter((c) => c !== color));
+          return;
+        }
+
+        setTempColor((prev) => [...prev, color]);
+      }}
+    />
+  ));
+
   return (
     <main className="container ">
       <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={open}>
@@ -124,6 +147,21 @@ function App() {
       <Modal isOpen={isOpen} close={close} title="Add A New Product">
         <form className="space-y-3" onSubmit={onSubmitHandler}>
           {renderFromInputList}
+          <div className="flex space-x-2 my-4 items-center flex-wrap">
+            {renderProductColors}
+          </div>
+
+          <div className="flex space-x-2 my-4 items-center flex-wrap">
+            {tempColor.map((color, index) => (
+              <span
+                key={index}
+                className="p-1 -mr-1 mb-1 text-xs rounded-md text-white"
+                style={{ backgroundColor: color }}
+              >
+                {color}
+              </span>
+            ))}
+          </div>
           <div className="flex items-center space-x-3">
             <Button className="bg-indigo-700 hover:bg-indigo-800" type="submit">
               Submit
