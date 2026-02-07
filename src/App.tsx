@@ -5,13 +5,15 @@ import Button from './components/ui/Button';
 import Input from './components/ui/Input';
 import { formInputList, productList } from './data';
 import type { IProduct } from './interface';
+import { productValidation } from './validation';
+import ErrorMessage from './components/ErrorMessage';
 
 function App() {
   const defaultProduct: IProduct = {
     title: '',
     description: '',
     imageURL: '',
-    price: 0,
+    price: '',
     colors: [],
     category: { name: '', imageURL: '' },
   };
@@ -19,17 +21,18 @@ function App() {
   // State
   const [product, setProduct] = useState<IProduct>(defaultProduct);
   const [isOpen, setIsOpen] = useState(true);
+  const [errors, setErrors] = useState({
+    title: '',
+    description: '',
+    imageURL: '',
+    price: '',
+  });
 
   const open = () => setIsOpen(true);
 
   const close = () => setIsOpen(false);
 
   // Handlers
-  const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log(product);
-  };
-
   const onCancel = () => {
     setProduct(defaultProduct);
   };
@@ -38,7 +41,7 @@ function App() {
     const { value, name } = e.target;
 
     if (name === 'price') {
-      setProduct({ ...product, price: Number(value) });
+      setProduct({ ...product, price: value });
       return;
     }
 
@@ -50,7 +53,28 @@ function App() {
       return;
     }
 
-    setProduct({ ...product, [name]: value } as unknown as IProduct);
+    setProduct({ ...product, [name]: value });
+
+    setErrors({ ...errors, [name]: '' });
+  };
+
+  const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const errors = productValidation(product).errors;
+
+    console.log('Validation Errors:', errors);
+
+    const hasErrorMsg =
+      Object.values(errors).some((error) => error !== '') &&
+      Object.values(errors).length > 0;
+
+    if (hasErrorMsg) {
+      setErrors(errors);
+      return;
+    }
+
+    alert('Form submitted successfully!');
+    setProduct(defaultProduct);
   };
 
   // Render
@@ -82,6 +106,9 @@ function App() {
           value={value}
           onChange={onChangeHandler}
         />
+        {errors[input.name as keyof typeof errors] && (
+          <ErrorMessage msg={errors[input.name as keyof typeof errors]} />
+        )}
       </div>
     );
   });
@@ -96,7 +123,6 @@ function App() {
       </div>
       <Modal isOpen={isOpen} close={close} title="Add A New Product">
         <form className="space-y-3" onSubmit={onSubmitHandler}>
-          
           {renderFromInputList}
           <div className="flex items-center space-x-3">
             <Button className="bg-indigo-700 hover:bg-indigo-800" type="submit">
