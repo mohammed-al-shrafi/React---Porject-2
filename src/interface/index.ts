@@ -10,7 +10,7 @@ export interface IProduct {
 
 export interface IFormInput {
   id: string;
-  name: string;
+  name: 'title' | 'description' | 'imageURL' | 'price' | 'category';
   label: string;
   type: string;
 }

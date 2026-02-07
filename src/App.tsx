@@ -1,39 +1,90 @@
-import { useState } from 'react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
 import ProductCard from './components/ProductCard';
 import Modal from './components/ui/Modal';
-import { formInputList, productList } from './data';
 import Button from './components/ui/Button';
 import Input from './components/ui/Input';
+import { formInputList, productList } from './data';
+import type { IProduct } from './interface';
 
 function App() {
+  const defaultProduct: IProduct = {
+    title: '',
+    description: '',
+    imageURL: '',
+    price: 0,
+    colors: [],
+    category: { name: '', imageURL: '' },
+  };
+
   // State
-  const [isOpen, setIsOpen] = useState(false);
+  const [product, setProduct] = useState<IProduct>(defaultProduct);
+  const [isOpen, setIsOpen] = useState(true);
 
-  function open() {
-    setIsOpen(true);
-  }
+  const open = () => setIsOpen(true);
 
-  function close() {
-    setIsOpen(false);
-  }
+  const close = () => setIsOpen(false);
+
+  // Handlers
+  const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(product);
+  };
+
+  const onCancel = () => {
+    setProduct(defaultProduct);
+  };
+
+  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = e.target;
+
+    if (name === 'price') {
+      setProduct({ ...product, price: Number(value) });
+      return;
+    }
+
+    if (name === 'category') {
+      setProduct({
+        ...product,
+        category: { ...product.category, name: value },
+      });
+      return;
+    }
+
+    setProduct({ ...product, [name]: value } as unknown as IProduct);
+  };
 
   // Render
   const renderProductList = productList.map((product) => (
     <ProductCard key={product.id} product={product} />
   ));
 
-  const renderFromInputList = formInputList.map((input) => (
-    <div key={input.id} className="mb-4">
-      <label
-        htmlFor={input.name}
-        className="block text-sm font-medium text-gray-700 mb-1"
-      >
-        {input.label}
-      </label>
+  const renderFromInputList = formInputList.map((input) => {
+    const value: string | number | readonly string[] | undefined =
+      input.name === 'category'
+        ? product.category.name
+        : input.name === 'price'
+          ? product.price
+          : (product as any)[input.name];
 
-      <Input type={input.type} id={input.name} name={input.name} />
-    </div>
-  ));
+    return (
+      <div key={input.id} className="mb-4">
+        <label
+          htmlFor={input.name}
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          {input.label}
+        </label>
+
+        <Input
+          type={input.type}
+          id={input.name}
+          name={input.name}
+          value={value}
+          onChange={onChangeHandler}
+        />
+      </div>
+    );
+  });
 
   return (
     <main className="container ">
@@ -44,16 +95,19 @@ function App() {
         {renderProductList}
       </div>
       <Modal isOpen={isOpen} close={close} title="Add A New Product">
-        <form className="space-y-3">
-          {' '}
+        <form className="space-y-3" onSubmit={onSubmitHandler}>
+          
           {renderFromInputList}
           <div className="flex items-center space-x-3">
-            <Button className="bg-indigo-700 hover:bg-indigo-800">
+            <Button className="bg-indigo-700 hover:bg-indigo-800" type="submit">
               Submit
             </Button>
-            <Button className="bg-gray-400 hover:bg-gray-500" onClick={close}>
-              {' '}
-              Cancel{' '}
+            <Button
+              className="bg-gray-400 hover:bg-gray-500"
+              onClick={onCancel}
+              type="button"
+            >
+              Cancel
             </Button>
           </div>
         </form>
