@@ -172,12 +172,6 @@ export const formInputList: IFormInput[] = [
     label: 'Product Price',
     type: 'text',
   },
-  {
-    id: 'category',
-    name: 'category',
-    label: 'Product Category',
-    type: 'text',
-  },
 ];
 
 export const colors = [

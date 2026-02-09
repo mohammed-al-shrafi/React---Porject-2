@@ -1,15 +1,15 @@
-import type {  HTMLAttributes } from "react";
+import type { HTMLAttributes } from 'react';
 
 interface IProps extends HTMLAttributes<HTMLSpanElement> {
   color: string;
   onClick?: () => void;
-
+  selected?: boolean;
 }
 
-const CircleColor = ({ color,  ...rest }: IProps) => {
+const CircleColor = ({ color, selected, ...rest }: IProps) => {
   return (
     <span
-      className="block w-5 h-5 rounded-full cursor-pointer"
+      className={`block w-5 h-5 rounded-full cursor-pointer ${selected ? 'ring-2 ring-offset-2 ring-indigo-500' : ''}`}
       style={{ backgroundColor: color }}
       {...rest}
     ></span>
